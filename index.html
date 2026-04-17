@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mycoaching2go.ch — Website Demo (Entwurf)</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background: #f4f4f2; color: #1a1a1a; font-size: 16px; }
+
+/* ── PAGE SWITCHER ── */
+.switcher { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; background: #1a1a1a; display: flex; align-items: center; gap: 6px; padding: 8px 16px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+.switcher .label { font-size: 11px; color: #666; margin-right: 4px; white-space: nowrap; }
+.switcher button { font-size: 12px; padding: 5px 13px; border-radius: 6px; border: none; background: #2e2e2e; color: #aaa; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.switcher button:hover { background: #3a3a3a; color: #fff; }
+.switcher button.on { background: #1A5C35; color: #fff; }
+.demo-badge { margin-left: auto; font-size: 11px; color: #666; white-space: nowrap; }
+
+/* ── WRAPPER ── */
+.site { max-width: 1000px; margin: 48px auto 0; background: #fff; }
+.pv { display: none; }
+.pv.on { display: block; }
+
+/* ── NAV ── */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; border-bottom: 1px solid #eee; background: #fff; position: sticky; top: 48px; z-index: 100; gap: 16px; }
+.logo { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #111; white-space: nowrap; }
+.logo span { color: #1A5C35; }
+.nav-links { display: flex; gap: 28px; }
+.nav-links a { font-size: 14px; color: #555; transition: color 0.2s; white-space: nowrap; }
+.nav-links a:hover, .nav-links a.on { color: #1A5C35; font-weight: 600; }
+.nav-cta { font-size: 14px; font-weight: 700; padding: 10px 22px; border-radius: 8px; background: #1A5C35; color: #fff; border: none; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+.nav-cta:hover { background: #14472a; }
+
+/* ── HERO ── */
+.hero { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: 480px; }
+.hero-text { padding: 64px 48px 64px 40px; display: flex; flex-direction: column; justify-content: center; }
+.hero-proof { font-size: 12px; color: #1A5C35; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; }
+.hero h1 { font-size: 36px; font-weight: 800; color: #111; line-height: 1.2; margin-bottom: 14px; letter-spacing: -1px; }
+.hero-sub { font-size: 17px; color: #555; line-height: 1.6; margin-bottom: 10px; }
+.hero-location { font-size: 13px; color: #888; margin-bottom: 28px; }
+.hero-location span { color: #1A5C35; font-weight: 500; }
+.hero-btns { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.btn-primary { font-size: 15px; font-weight: 700; padding: 13px 26px; border-radius: 9px; background: #1A5C35; color: #fff; border: none; cursor: pointer; transition: background 0.2s; }
+.btn-primary:hover { background: #14472a; }
+.btn-play { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #555; cursor: pointer; border: none; background: none; padding: 0; }
+.play-icon { width: 36px; height: 36px; border-radius: 50%; background: #f0f0ee; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #1A5C35; border: 1.5px solid #ddd; }
+.hero-img { background: linear-gradient(135deg, #d4e8db 0%, #b8d9c4 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.hero-img-placeholder { text-align: center; color: #1A5C35; }
+.hero-img-placeholder .icon { font-size: 64px; opacity: 0.4; margin-bottom: 12px; }
+.hero-img-placeholder p { font-size: 13px; color: #0F6E56; opacity: 0.7; }
+
+/* ── SECTIONS ── */
+.section { padding: 64px 40px; }
+.section-alt { background: #f9faf8; }
+.slabel { font-size: 12px; color: #1A5C35; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 10px; }
+.stitle { font-size: 28px; font-weight: 800; color: #111; margin-bottom: 10px; letter-spacing: -0.5px; }
+.ssub { font-size: 16px; color: #666; line-height: 1.6; margin-bottom: 36px; max-width: 600px; }
+
+/* ── ORIENTATION TILES 2×3 ── */
+.tiles-2x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tile { border: 1.5px solid #e8e8e4; border-radius: 14px; padding: 0; cursor: pointer; transition: all 0.2s; overflow: hidden; }
+.tile:hover { border-color: #1A5C35; box-shadow: 0 6px 24px rgba(26,92,53,0.12); transform: translateY(-3px); }
+.tile-img { height: 140px; background: #e8e8e4; display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; overflow: hidden; transition: filter 0.3s; filter: grayscale(100%); }
+.tile:hover .tile-img { filter: grayscale(0%); }
+.tile-img.green { background: linear-gradient(135deg, #c8e6d4, #9fd4b4); }
+.tile-img.blue { background: linear-gradient(135deg, #c8d8e8, #9fbdd4); }
+.tile-img.amber { background: linear-gradient(135deg, #e8dcc8, #d4c49f); }
+.tile-img.teal { background: linear-gradient(135deg, #c8e0e8, #9fcad4); }
+.tile-img.purple { background: linear-gradient(135deg, #dcc8e8, #c49fd4); }
+.tile-img.dark { background: linear-gradient(135deg, #2a2a2a, #1A5C35); color: #fff; }
+.tile-body { padding: 18px 16px; }
+.tile h3 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 6px; line-height: 1.3; }
+.tile p { font-size: 13px; color: #666; line-height: 1.5; }
+.tile-link { font-size: 13px; color: #1A5C35; font-weight: 600; margin-top: 10px; display: block; }
+
+/* ── ABOUT BLOCK ── */
+.about-grid { display: grid; grid-template-columns: 200px 1fr; gap: 40px; align-items: start; }
+.about-avatar { width: 180px; height: 180px; border-radius: 16px; background: linear-gradient(135deg, #9FE1CB, #5DCAA5); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 800; color: #085041; }
+.about-name { font-size: 22px; font-weight: 800; color: #111; margin-bottom: 4px; }
+.about-role { font-size: 14px; color: #1A5C35; font-weight: 600; margin-bottom: 16px; }
+.about-text { font-size: 15px; color: #555; line-height: 1.8; margin-bottom: 16px; }
+.about-link { font-size: 14px; color: #1A5C35; font-weight: 600; }
+
+/* ── PROCESS STEPS ── */
+.process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+.process-step { text-align: center; padding: 24px 16px; background: #f9faf8; border-radius: 12px; border: 1px solid #eee; }
+.process-num { width: 40px; height: 40px; border-radius: 50%; background: #1A5C35; color: #fff; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.process-step h4 { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 6px; }
+.process-step p { font-size: 12px; color: #666; line-height: 1.5; }
+.walk-hint { background: #eef6f1; border-left: 3px solid #1A5C35; border-radius: 0 8px 8px 0; padding: 14px 18px; font-size: 14px; color: #1A5C35; margin-top: 8px; }
+.walk-hint a { font-weight: 700; }
+
+/* ── WALK MINI BLOCK ── */
+.walk-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 0; background: #eef6f1; border-radius: 16px; overflow: hidden; margin: 48px 0; }
+.walk-mini-img { background: linear-gradient(135deg, #c8e6d4, #85c4a0); display: flex; align-items: center; justify-content: center; font-size: 64px; min-height: 200px; }
+.walk-mini-text { padding: 36px 32px; display: flex; flex-direction: column; justify-content: center; }
+.walk-mini-text h3 { font-size: 20px; font-weight: 800; color: #1A5C35; margin-bottom: 10px; }
+.walk-mini-text p { font-size: 14px; color: #2a5c3a; line-height: 1.7; margin-bottom: 20px; }
+.btn-outline { font-size: 14px; font-weight: 600; padding: 10px 20px; border-radius: 8px; background: transparent; color: #1A5C35; border: 2px solid #1A5C35; cursor: pointer; transition: all 0.2s; display: inline-block; }
+.btn-outline:hover { background: #1A5C35; color: #fff; }
+
+/* ── SEO TILES 4 ── */
+.seo-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.seo-tile { border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+.seo-tile:hover { transform: translateY(-3px); }
+.seo-img { height: 120px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 32px; filter: grayscale(100%) contrast(1.1); }
+.seo-img.l1 { background: linear-gradient(135deg, #888, #555); }
+.seo-img.l2 { background: linear-gradient(135deg, #777, #444); }
+.seo-img.l3 { background: linear-gradient(135deg, #666, #333); }
+.seo-img.l4 { background: linear-gradient(135deg, #555, #222); }
+.seo-body { background: #f9faf8; padding: 16px; border: 1px solid #eee; border-top: none; border-radius: 0 0 12px 12px; }
+.seo-body h4 { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 6px; line-height: 1.3; }
+.seo-body p { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 10px; }
+.seo-body a { font-size: 12px; color: #1A5C35; font-weight: 600; }
+
+/* ── TESTIMONIALS ── */
+.testi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.testi { background: #f9faf8; border-radius: 12px; padding: 24px; border: 1px solid #eee; }
+.testi-quote { font-size: 15px; color: #333; line-height: 1.7; font-style: italic; margin-bottom: 14px; }
+.testi-quote::before { content: '»'; color: #1A5C35; font-weight: 800; font-size: 18px; font-style: normal; }
+.testi-quote::after { content: '«'; color: #1A5C35; font-weight: 800; font-size: 18px; font-style: normal; }
+.testi-author { font-size: 13px; font-weight: 700; color: #111; }
+.testi-role { font-size: 12px; color: #888; }
+
+/* ── BLOG PREVIEW ── */
+.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.blog-card { border: 1px solid #eee; border-radius: 12px; overflow: hidden; transition: box-shadow 0.2s; cursor: pointer; }
+.blog-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.blog-img { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.blog-img.g1 { background: linear-gradient(135deg, #d4e8db, #b8d9c4); }
+.blog-img.g2 { background: linear-gradient(135deg, #e8dbd4, #d9c4b8); }
+.blog-img.g3 { background: linear-gradient(135deg, #d4dbe8, #b8c4d9); }
+.blog-body { padding: 16px; }
+.blog-tag { font-size: 11px; color: #1A5C35; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.blog-body h4 { font-size: 14px; font-weight: 700; color: #111; line-height: 1.4; margin-bottom: 4px; }
+.blog-body p { font-size: 12px; color: #aaa; }
+
+/* ── LOGOS ── */
+.logos-row { display: flex; gap: 32px; align-items: center; justify-content: center; flex-wrap: wrap; padding: 32px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+.logo-item { font-size: 13px; font-weight: 700; color: #bbb; letter-spacing: 0.05em; filter: grayscale(100%) opacity(0.5); transition: filter 0.2s; cursor: pointer; padding: 8px 12px; background: #f5f5f3; border-radius: 6px; }
+.logo-item:hover { filter: grayscale(0%) opacity(1); color: #1A5C35; }
+
+/* ── FOOTER CTA ── */
+.footer-cta { background: #1A5C35; padding: 56px 40px; text-align: center; }
+.footer-cta h2 { font-size: 30px; font-weight: 800; color: #fff; margin-bottom: 10px; letter-spacing: -0.5px; }
+.footer-cta p { font-size: 16px; color: rgba(255,255,255,0.75); margin-bottom: 28px; }
+.btn-white { font-size: 15px; font-weight: 700; padding: 14px 32px; border-radius: 9px; background: #fff; color: #1A5C35; border: none; cursor: pointer; transition: all 0.2s; }
+.btn-white:hover { background: #f0f0ee; }
+.footer-meta { margin-top: 14px; font-size: 13px; color: rgba(255,255,255,0.5); }
+
+/* ── FOOTER ── */
+footer { padding: 24px 40px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: #fff; }
+footer p { font-size: 13px; color: #aaa; }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-size: 13px; color: #aaa; transition: color 0.2s; }
+.footer-links a:hover { color: #1A5C35; }
+
+/* ── SERVICE PAGE ── */
+.service-hero { padding: 56px 40px 48px; background: #f9faf8; border-bottom: 1px solid #eee; }
+.service-badge { display: inline-block; font-size: 12px; padding: 5px 14px; border-radius: 20px; margin-bottom: 14px; font-weight: 600; }
+.service-hero h1 { font-size: 34px; font-weight: 800; color: #111; margin-bottom: 14px; letter-spacing: -0.5px; line-height: 1.2; }
+.service-hero p { font-size: 17px; color: #555; line-height: 1.7; max-width: 640px; }
+.topics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 48px; }
+.topic { border: 1.5px solid #eee; border-radius: 12px; padding: 22px; transition: border-color 0.2s; }
+.topic:hover { border-color: #1A5C35; }
+.topic h4 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 8px; }
+.topic p { font-size: 13px; color: #666; line-height: 1.6; }
+.accordion { border: 1px solid #eee; border-radius: 12px; overflow: hidden; margin-bottom: 48px; }
+.acc-item { border-bottom: 1px solid #eee; }
+.acc-item:last-child { border-bottom: none; }
+.acc-header { padding: 16px 20px; font-size: 14px; font-weight: 600; color: #111; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; }
+.acc-header:hover { background: #f9faf8; }
+.acc-arrow { font-size: 12px; color: #1A5C35; transition: transform 0.2s; }
+.acc-body { padding: 0 20px 16px; font-size: 14px; color: #666; line-height: 1.7; display: none; }
+.acc-body.open { display: block; }
+.process-col { display: flex; flex-direction: column; gap: 16px; margin-bottom: 48px; }
+.step-row { display: flex; gap: 16px; align-items: flex-start; }
+.step-num { width: 32px; height: 32px; border-radius: 50%; background: #1A5C35; color: #fff; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.step-content h5 { font-size: 15px; font-weight: 700; color: #111; margin-bottom: 4px; }
+.step-content p { font-size: 14px; color: #666; line-height: 1.6; }
+.cta-bar { background: #eef6f1; border-radius: 14px; padding: 28px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.cta-bar-text h3 { font-size: 18px; font-weight: 800; color: #1A5C35; margin-bottom: 4px; }
+.cta-bar-text p { font-size: 13px; color: #2a5c3a; }
+
+/* ── WALK PAGE ── */
+.walk-hero { background: linear-gradient(135deg, #eef6f1 0%, #d4ead9 100%); padding: 64px 40px; }
+.walk-hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.walk-hero h1 { font-size: 34px; font-weight: 800; color: #1A5C35; margin-bottom: 14px; letter-spacing: -0.5px; }
+.walk-hero p { font-size: 16px; color: #2a5c3a; line-height: 1.7; margin-bottom: 24px; }
+.walk-photo { background: linear-gradient(135deg, #85c4a0, #5da87a); border-radius: 16px; min-height: 280px; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+.benefits-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 48px; }
+.benefit { border: 1.5px solid #c8e6d4; border-radius: 12px; padding: 22px; background: #fff; }
+.benefit-icon { font-size: 24px; margin-bottom: 10px; }
+.benefit h4 { font-size: 14px; font-weight: 700; color: #1A5C35; margin-bottom: 6px; }
+.benefit p { font-size: 13px; color: #555; line-height: 1.5; }
+.settings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 48px; }
+.setting { background: #f9faf8; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #eee; }
+.setting-icon { font-size: 28px; margin-bottom: 10px; }
+.setting h4 { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 6px; }
+.setting p { font-size: 12px; color: #888; line-height: 1.5; }
+
+/* ── WATERMARK ── */
+.watermark { background: #1a1a1a; padding: 10px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 2px solid #1A5C35; }
+.watermark-left { font-size: 12px; color: #aaa; }
+.watermark-left strong { color: #1A5C35; font-weight: 700; }
+.watermark-right { font-size: 11px; color: #555; font-style: italic; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  nav { padding: 12px 16px; }
+  .nav-links { display: none; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-img { min-height: 200px; }
+  .hero-text { padding: 32px 16px; }
+  .hero h1 { font-size: 26px; }
+  .tiles-2x3 { grid-template-columns: 1fr 1fr; }
+  .process-grid { grid-template-columns: 1fr 1fr; }
+  .seo-tiles { grid-template-columns: 1fr 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; }
+  .walk-mini { grid-template-columns: 1fr; }
+  .walk-hero-inner { grid-template-columns: 1fr; }
+  .benefits-grid, .topics-grid { grid-template-columns: 1fr; }
+  .settings-grid { grid-template-columns: 1fr; }
+  .section { padding: 40px 16px; }
+  .service-hero { padding: 36px 16px; }
+  .cta-bar { flex-direction: column; }
+  .footer-cta { padding: 40px 16px; }
+  footer { padding: 20px 16px; flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE SWITCHER -->
+<div class="switcher">
+  <span class="label">Demo — Seite wählen:</span>
+  <button class="on" onclick="sp('home',this)">🏠 Startseite</button>
+  <button onclick="sp('priv',this)">👤 Privatpersonen</button>
+  <button onclick="sp('exec',this)">💼 Führungskräfte</button>
+  <button onclick="sp('team',this)">🤝 Teams</button>
+  <button onclick="sp('walk',this)">🌿 Walk & Talk</button>
+  <button onclick="sp('blog',this)">✍️ Blog</button>
+  <span class="demo-badge">Entwurf für mycoaching2go.ch · April 2026</span>
+</div>
+
+<div class="site">
+
+<!-- ═══════════════════════════════════════════
+     STARTSEITE
+═══════════════════════════════════════════ -->
+<div id="home" class="pv on">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#">Angebote ▾</a>
+      <a href="#">Walk & Talk</a>
+      <a href="#">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+
+  <!-- 5.1 HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-proof">Über 20 Jahre Erfahrung in Führung & HR</div>
+      <h1>Themen klären und wirklich etwas bewegen.</h1>
+      <p class="hero-sub">Für Menschen, Teams und Unternehmungen, die Klarheit gewinnen und weiterkommen wollen.</p>
+      <p class="hero-location">Leadership- & Business-Coaching mit Beratung sowie Karriere & Standortbestimmung.<br><span>📍 Kilchberg bei Zürich</span> — und schweizweit.</p>
+      <div class="hero-btns">
+        <button class="btn-primary">Erstgespräch vereinbaren</button>
+        <button class="btn-play">
+          <div class="play-icon">▶</div>
+          <span>Video-Intro (45 Sek.)</span>
+        </button>
+      </div>
+    </div>
+    <div class="hero-img">
+      <div class="hero-img-placeholder">
+        <div class="icon">📸</div>
+        <p>Foto Marcel<br>Business + Natur<br>1920×900 px · WebP</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.2 ORIENTIERUNGSKACHELN -->
+  <div class="section">
+    <div class="slabel">Orientierung</div>
+    <div class="stitle">Wo möchtest du starten?</div>
+    <div class="tiles-2x3">
+      <div class="tile" onclick="sp('priv',null)">
+        <div class="tile-img green">🌊</div>
+        <div class="tile-body">
+          <h3>Für Privatpersonen</h3>
+          <p>Orientierung finden, wo du stehst, und was der nächste Schritt ist.</p>
+          <span class="tile-link">Mehr erfahren →</span>
+        </div>
+      </div>
+      <div class="tile" onclick="sp('exec',null)">
+        <div class="tile-img blue">🏙️</div>
+        <div class="tile-body">
+          <h3>Für Führungskräfte</h3>
+          <p>Rolle klären. Entscheidungen treffen. Wirkung stärken.</p>
+          <span class="tile-link">Mehr erfahren →</span>
+        </div>
+      </div>
+      <div class="tile" onclick="sp('team',null)">
+        <div class="tile-img amber">🤝</div>
+        <div class="tile-body">
+          <h3>Für Teams & Unternehmungen</h3>
+          <p>Zusammenarbeit klären, Verantwortung definieren und gemeinsam Ergebnisse erarbeiten.</p>
+          <span class="tile-link">Mehr erfahren →</span>
+        </div>
+      </div>
+      <div class="tile" onclick="sp('walk',null)">
+        <div class="tile-img teal">🌿</div>
+        <div class="tile-body">
+          <h3>Wie ich arbeite</h3>
+          <p>💬 Gespräch im Raum &nbsp;·&nbsp; 🌿 Walk & Talk &nbsp;·&nbsp; 💻 Online möglich</p>
+          <span class="tile-link">Walk & Talk entdecken →</span>
+        </div>
+      </div>
+      <div class="tile">
+        <div class="tile-img purple">⭐</div>
+        <div class="tile-body">
+          <h3>Warum mycoaching2go?</h3>
+          <p>Bodenständig, auf Augenhöhe und ergebnisorientiert – mit über 20 Jahren Führungs- und HR-Erfahrung.</p>
+          <span class="tile-link">Über mich →</span>
+        </div>
+      </div>
+      <div class="tile" style="background:#1A5C35;">
+        <div class="tile-img dark">🚀</div>
+        <div class="tile-body" style="background:#1A5C35;">
+          <h3 style="color:#fff;">Jetzt starten →</h3>
+          <p style="color:rgba(255,255,255,0.75);">Unverbindliches Erstgespräch – 30 Minuten, kostenlos, telefonisch.</p>
+          <span class="tile-link" style="color:#9FE1CB;">Kontakt aufnehmen →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.3 ÜBER MARCEL -->
+  <div class="section section-alt">
+    <div class="slabel">Über mich</div>
+    <div class="about-grid">
+      <div class="about-avatar">MS</div>
+      <div>
+        <div class="about-name">Marcel Sonderer</div>
+        <div class="about-role">Diplomierter Business-, Leadership- & Life-Coach · Executive Berater</div>
+        <p class="about-text">Der Name mycoaching2go ist bewusst gewählt. «my coaching» steht für persönliche, professionelle Beratung. «2go» steht für Lösungen und Impulse, die nicht theoretisch bleiben, sondern im Alltag rasch greifen und direkt umsetzbar sind.<br><br>Ich begleite Menschen, Führungspersonen und Teams in anspruchsvollen beruflichen und persönlichen Entwicklungsphasen – bodenständig, auf Augenhöhe und ergebnisorientiert. Standort: Kilchberg bei Zürich.</p>
+        <a class="about-link" href="#">Mehr über mich →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.4 SO FUNKTIONIERT'S -->
+  <div class="section">
+    <div class="slabel">Ablauf</div>
+    <div class="stitle">So funktioniert's</div>
+    <div class="process-grid">
+      <div class="process-step">
+        <div class="process-num">1</div>
+        <h4>Unverbindliches Erstgespräch</h4>
+        <p>Kennenlernen, Anliegen klären – kostenlos und vertraulich</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">2</div>
+        <h4>Format & Ziele</h4>
+        <p>Setting und Vorgehen gemeinsam festlegen</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">3</div>
+        <h4>Begleitung & Beratung</h4>
+        <p>Klare Einschätzungen, fokussierte Sessions – Indoor oder Outdoor</p>
+      </div>
+      <div class="process-step">
+        <div class="process-num">4</div>
+        <h4>Ergebnis</h4>
+        <p>Konkrete Entscheidungen und nächste Schritte für den Alltag</p>
+      </div>
+    </div>
+    <div class="walk-hint">🌿 Viele Gespräche finden draussen statt – weil Bewegung oft Klarheit bringt. <a href="#" onclick="sp('walk',null)">Mehr dazu auf der Walk & Talk Seite →</a></div>
+  </div>
+
+  <!-- 5.4b WALK MINI BLOCK -->
+  <div style="padding: 0 40px;">
+    <div class="walk-mini">
+      <div class="walk-mini-img">🌲</div>
+      <div class="walk-mini-text">
+        <h3>Walk & Talk — Coaching in der Natur</h3>
+        <p>Bewegung befreit den Kopf. Coaching im Gehen fördert Kreativität, Klarheit und neue Perspektiven – im Sihlwald, am Zürichsee oder auf einem Kilchberg-Weg.</p>
+        <button class="btn-outline" onclick="sp('walk',null)">Mehr erfahren →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.5 SEO KACHELN -->
+  <div class="section section-alt">
+    <div class="slabel">Themen</div>
+    <div class="stitle">Wie ich dich unterstützen kann</div>
+    <p class="ssub">Vier Kernbereiche – sichtbar, klar und direkt umsetzbar.</p>
+    <div class="seo-tiles">
+      <div class="seo-tile" onclick="sp('exec',null)">
+        <div class="seo-img l1">✍️</div>
+        <div class="seo-body">
+          <h4>Leadership & Executive Coaching</h4>
+          <p>Ich begleite dich als Führungsperson bei der Klärung deiner Rolle und der Stärkung deiner Wirkung – von der ersten Führungsaufgabe bis zum C-Level.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+      <div class="seo-tile" onclick="sp('priv',null)">
+        <div class="seo-img l2">🪜</div>
+        <div class="seo-body">
+          <h4>Karriere & Neuorientierung</h4>
+          <p>Gemeinsam gehen wir Outplacements sowie Standortbestimmungen und Neuorientierungen strukturiert an, damit du klare nächste Schritte für deine Laufbahn definieren kannst.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+      <div class="seo-tile" onclick="sp('team',null)">
+        <div class="seo-img l3">☕</div>
+        <div class="seo-body">
+          <h4>Team-Entwicklung & Workshops</h4>
+          <p>Wir klären die Zusammenarbeit in deinem Team, schärfen Verantwortlichkeiten und erarbeiten gemeinsam konkrete Ergebnisse für euren Erfolg.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+      <div class="seo-tile" onclick="sp('priv',null)">
+        <div class="seo-img l4">🪨</div>
+        <div class="seo-body">
+          <h4>Energie & Belastung im Alltag</h4>
+          <p>Erhalte deine Energie, reduziere Stress nachhaltig und finde Wege, um in anspruchsvollen Phasen leistungsfähig und gesund zu bleiben.</p>
+          <a href="#">Mehr erfahren →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.6 TESTIMONIALS -->
+  <div class="section">
+    <div class="slabel">Kundenstimmen</div>
+    <div class="stitle">Was andere sagen</div>
+    <div class="testi-grid">
+      <div class="testi">
+        <p class="testi-quote">Marcel kann Menschen motivieren, über ihre Grenzen hinaus zu denken.</p>
+        <div class="testi-author">Myriam B.</div>
+        <div class="testi-role">Regions-Leiterin, Finanzbranche</div>
+      </div>
+      <div class="testi">
+        <p class="testi-quote">Spürbare Wirkung ab der ersten Sitzung. Walk-&-Talk-Coaching für Klarheit in Business und Leben.</p>
+        <div class="testi-author">C. Seidel</div>
+        <div class="testi-role">Teamleiterin und Unternehmerin</div>
+      </div>
+      <div class="testi">
+        <p class="testi-quote">Massgeschneidertes und persönliches Coaching mit wichtigen Erkenntnissen für den Berufsalltag.</p>
+        <div class="testi-author">Barbara G.</div>
+        <div class="testi-role">Leiterin Intensiv-Pflege</div>
+      </div>
+      <div class="testi">
+        <p class="testi-quote">Top-Mischung aus Theorie und verbindlichem Weiterkommen anhand konkreter Fälle.</p>
+        <div class="testi-author">Sylvio R.</div>
+        <div class="testi-role">Gastronomie-Besitzer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.7 BLOG -->
+  <div class="section section-alt">
+    <div class="slabel">Blog</div>
+    <div class="stitle">Aus dem Blog</div>
+    <div class="blog-grid">
+      <div class="blog-card">
+        <div class="blog-img g1">🧠</div>
+        <div class="blog-body">
+          <div class="blog-tag">Work-Life-Balance</div>
+          <h4>Mentale Gesundheit: Balance & Performance steigern</h4>
+          <p>April 2025</p>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img g2">🌱</div>
+        <div class="blog-body">
+          <div class="blog-tag">Persönlichkeit</div>
+          <h4>Vom Scheitern zum Erfolg — Entwicklung durch Lernen</h4>
+          <p>März 2025</p>
+        </div>
+      </div>
+      <div class="blog-card">
+        <div class="blog-img g3">🎯</div>
+        <div class="blog-body">
+          <div class="blog-tag">Karriere</div>
+          <h4>Deine wahre Leidenschaft entdecken</h4>
+          <p>Februar 2025</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5.8 LOGOS -->
+  <div class="section">
+    <div class="slabel">Vertrauen & Netzwerk</div>
+    <div class="stitle">Kunden & Partner</div>
+    <div class="logos-row">
+      <div class="logo-item">ZKB</div>
+      <div class="logo-item">SVA Zürich</div>
+      <div class="logo-item">Bank Thalwil</div>
+      <div class="logo-item">Bank Zimmerberg</div>
+      <div class="logo-item">Dr. Nadig & Partner</div>
+      <div class="logo-item">HYG Weggis</div>
+      <div class="logo-item">senio-fit</div>
+      <div class="logo-item">rüüm</div>
+    </div>
+  </div>
+
+  <!-- 5.9 FOOTER CTA -->
+  <div class="footer-cta">
+    <h2>Bereit für den ersten Schritt?</h2>
+    <p>Unverbindliches Erstgespräch vereinbaren — 30 Minuten, kostenlos, telefonisch oder per Zoom.</p>
+    <button class="btn-white">Erstgespräch vereinbaren</button>
+    <div class="footer-meta">Kilchberg bei Zürich · schweizweit · online</div>
+  </div>
+
+  <!-- 5.10 FOOTER -->
+  <footer>
+    <p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p>
+    <div class="footer-links">
+      <a href="#">Über mich</a>
+      <a href="#">FAQ</a>
+      <a href="#">Impressum</a>
+      <a href="#">Datenschutz</a>
+      <a href="#">Facebook</a>
+    </div>
+  </footer>
+  <div class="watermark">
+    <div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div>
+    <div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PRIVATPERSONEN
+═══════════════════════════════════════════ -->
+<div id="priv" class="pv">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#" class="on">Angebote ▾</a>
+      <a href="#">Walk & Talk</a>
+      <a href="#">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+  <div class="service-hero">
+    <div class="service-badge" style="background:#E1F5EE;color:#085041;">Für Privatpersonen</div>
+    <h1>Life & Career Coaching Zürich — Klarheit gewinnen, weiterkommen.</h1>
+    <p>Du stehst vor einer Veränderung, suchst Orientierung oder möchtest dein Potenzial entfalten? Als diplomierter Life- und Career-Coach begleite ich dich individuell – indoor, beim Walk & Talk oder online.</p>
+  </div>
+  <div class="section">
+    <div class="slabel">Hauptleistungen</div>
+    <div class="stitle">Womit kann ich dir helfen?</div>
+    <div class="topics-grid">
+      <div class="topic"><h4>🎯 Karriere & Laufbahnplanung</h4><p>Standortbestimmung, Neuorientierung, Jobwechsel und Karrierestrategie – Schritt für Schritt.</p></div>
+      <div class="topic"><h4>⚖️ Work-Life-Balance & Resilienz</h4><p>Stress reduzieren, Prioritäten setzen und langfristig leistungsfähig bleiben.</p></div>
+      <div class="topic"><h4>🌟 Persönlichkeitsentwicklung</h4><p>Stärken erkennen, Selbstbewusstsein stärken, Kommunikation und Auftritt verbessern.</p></div>
+      <div class="topic"><h4>🚪 Outplacement-Coaching</h4><p>Neuorientierung nach Jobverlust – neue Perspektiven entdecken und den richtigen Weg finden.</p></div>
+    </div>
+    <div class="slabel">Details</div>
+    <div class="accordion">
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Berufliche Standortbestimmung & Neuorientierung <span class="acc-arrow">▾</span></div><div class="acc-body">Wo stehst du beruflich? Was willst du erreichen? Gemeinsam analysieren wir deine aktuelle Situation, klären Stärken und Entwicklungspotenziale und definieren einen klaren nächsten Schritt.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Laufbahnplanung & Job-Coaching <span class="acc-arrow">▾</span></div><div class="acc-body">Von der Karrierestrategie bis zur Bewerbungsvorbereitung – ich begleite dich durch den gesamten Prozess mit konkreten Massnahmen und ehrlichem Feedback.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Stress, Balance & Resilienz <span class="acc-arrow">▾</span></div><div class="acc-body">Anspruchsvolle Phasen im Berufs- und Privatleben fordern uns heraus. Ich helfe dir, Energie zu erhalten, klare Grenzen zu setzen und gesund leistungsfähig zu bleiben.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Retreats & Intensiv-Coaching <span class="acc-arrow">▾</span></div><div class="acc-body">Für tiefgreifende Themen biete ich Intensiv-Sessions und Retreats an – Natur, Stille und fokussierte Arbeit an deinen wichtigsten Fragen.</div></div>
+    </div>
+    <div class="slabel">Ablauf</div>
+    <div class="stitle">So gehen wir vor</div>
+    <div class="process-col">
+      <div class="step-row"><div class="step-num">1</div><div class="step-content"><h5>Kostenloses Erstgespräch</h5><p>Kennenlernen & Situationsanalyse – kostenlos, unverbindlich, telefonisch oder per Zoom.</p></div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-content"><h5>Ziele & Format klären</h5><p>Indoor in Zürich, Walk & Talk in der Natur oder online – du wählst das passende Setting.</p></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-content"><h5>Coaching starten</h5><p>Massgeschneidert, schrittweise und auf Augenhöhe – mit sofort wirksamen Lösungen.</p></div></div>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-text"><h3>Kostenloses Erstgespräch vereinbaren</h3><p>Kilchberg bei Zürich · schweizweit · online</p></div>
+      <button class="btn-primary">Jetzt anfragen</button>
+    </div>
+  </div>
+  <footer><p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p><div class="footer-links"><a href="#">FAQ</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div></footer>
+  <div class="watermark"><div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div><div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     FÜHRUNGSKRÄFTE
+═══════════════════════════════════════════ -->
+<div id="exec" class="pv">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#" class="on">Angebote ▾</a>
+      <a href="#">Walk & Talk</a>
+      <a href="#">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+  <div class="service-hero">
+    <div class="service-badge" style="background:#E6F1FB;color:#0C447C;">Für Führungskräfte</div>
+    <h1>Executive & Leadership Coaching Zürich — Rolle klären. Wirkung stärken.</h1>
+    <p>Als Führungskraft trägst du grosse Verantwortung. Executive Coaching stärkt deine Entscheidungsfähigkeit, Führungskompetenz und persönliche Wirkung – vertraulich, auf Augenhöhe und praxisnah.</p>
+  </div>
+  <div class="section">
+    <div class="slabel">Hauptleistungen</div>
+    <div class="stitle">Schwerpunkte im Executive Coaching</div>
+    <div class="topics-grid">
+      <div class="topic"><h4>🎖️ Leadership-Entwicklung</h4><p>Führungsstil schärfen, Autorität und Empathie verbinden, Wirkung als Führungsperson steigern.</p></div>
+      <div class="topic"><h4>🔀 Entscheidung & Change</h4><p>Komplexe Entscheidungen treffen und Change-Prozesse proaktiv steuern.</p></div>
+      <div class="topic"><h4>🎤 Executive Presence</h4><p>Auftrittskompetenz, Kommunikation und persönliche Wirkung in Meetings und Boards.</p></div>
+      <div class="topic"><h4>⚡ Konflikte & Krisen</h4><p>Konfliktlösung im Team und mit Stakeholdern – Krisenmanagement und Resilienz unter Druck.</p></div>
+    </div>
+    <div class="slabel">Details</div>
+    <div class="accordion">
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Führungskräfte-Coaching & Führungscoaching <span class="acc-arrow">▾</span></div><div class="acc-body">Ob erste Führungsrolle oder C-Level – ich begleite dich bei der Klärung deiner Rolle, dem Aufbau deiner Autorität und der nachhaltigen Stärkung deiner Führungswirkung.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Executive Coaching & Leadership Coaching <span class="acc-arrow">▾</span></div><div class="acc-body">Für Senior Leads, Directors und C-Level: vertrauliches Coaching auf höchstem professionellen Niveau – mit klarem Fokus auf Ergebnis und Transfer in den Führungsalltag.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Retreats für Führungskräfte <span class="acc-arrow">▾</span></div><div class="acc-body">Intensiv-Sessions und Retreats für tiefgreifende Reflexion – Natur, Stille und fokussierte Arbeit an deinen wichtigsten Führungsfragen.</div></div>
+    </div>
+    <div class="slabel">Ablauf</div>
+    <div class="stitle">Vertraulich und strukturiert</div>
+    <div class="process-col">
+      <div class="step-row"><div class="step-num">1</div><div class="step-content"><h5>Vertrauliches Erstgespräch</h5><p>Situationsanalyse und Zieldefinition – telefonisch, in Zürich oder per Zoom.</p></div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-content"><h5>Individuelles Coaching-Programm</h5><p>Massgeschneidert auf deine Situation, Rolle und Ziele – flexibel terminiert.</p></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-content"><h5>Transfer & Reflexion</h5><p>Ergebnisse in den Führungsalltag integrieren und nachhaltig verankern.</p></div></div>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-text"><h3>Vertrauliches Erstgespräch anfragen</h3><p>Für C-Level, Directors & Senior Leads · Zürich & schweizweit</p></div>
+      <button class="btn-primary">Jetzt anfragen</button>
+    </div>
+  </div>
+  <footer><p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p><div class="footer-links"><a href="#">FAQ</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div></footer>
+  <div class="watermark"><div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div><div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TEAMS
+═══════════════════════════════════════════ -->
+<div id="team" class="pv">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#" class="on">Angebote ▾</a>
+      <a href="#">Walk & Talk</a>
+      <a href="#">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+  <div class="service-hero">
+    <div class="service-badge" style="background:#FAEEDA;color:#633806;">Für Teams & Unternehmungen</div>
+    <h1>Team Coaching & Workshops Zürich — Zusammenarbeit klären, Ergebnisse erarbeiten.</h1>
+    <p>Starke Teams entstehen nicht zufällig. Mit gezieltem Team-Coaching und Strategie-Workshops begleite ich dein Unternehmen durch Veränderungen und stärke die Zusammenarbeit nachhaltig.</p>
+  </div>
+  <div class="section">
+    <div class="slabel">Hauptleistungen</div>
+    <div class="stitle">Was ich für dein Team anbiete</div>
+    <div class="topics-grid">
+      <div class="topic"><h4>🧩 Teamentwicklung</h4><p>Rollen klären, Zusammenarbeit stärken, Vertrauen aufbauen und gemeinsame Werte verankern.</p></div>
+      <div class="topic"><h4>🗺️ Strategie-Workshop</h4><p>Von der Vision zur Umsetzung – Ziele definieren und das Team gemeinsam ausrichten.</p></div>
+      <div class="topic"><h4>🔄 Change Management</h4><p>Veränderungsprozesse professionell begleiten und Wandel erfolgreich umsetzen.</p></div>
+      <div class="topic"><h4>🕊️ Konfliktlösung</h4><p>Spannungen im Team konstruktiv lösen und das Arbeitsklima dauerhaft verbessern.</p></div>
+    </div>
+    <div class="slabel">Details</div>
+    <div class="accordion">
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Team-Entwicklung & Team-Coaching <span class="acc-arrow">▾</span></div><div class="acc-body">Ich begleite dein Team in der Klärung von Rollen, Verantwortlichkeiten und Zusammenarbeit – mit konkreten Massnahmen und nachhaltiger Wirkung.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Workshops: Indoor & Outdoor <span class="acc-arrow">▾</span></div><div class="acc-body">Von der klassischen Sitzung bis zum Outdoor-Workshop – ich passe das Format an euren Bedarf an. Auch als Walk & Talk für Teams möglich.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Strategie-Workshop: Von der Vision zur Umsetzung <span class="acc-arrow">▾</span></div><div class="acc-body">Gemeinsam entwickeln wir eine klare Strategie, priorisieren Massnahmen und legen verbindliche nächste Schritte fest.</div></div>
+      <div class="acc-item"><div class="acc-header" onclick="tog(this)">Change Management & Transition <span class="acc-arrow">▾</span></div><div class="acc-body">Veränderungen in Organisationen sind komplex. Ich begleite euer Team durch Transition-Phasen mit klarer Struktur, Empathie und Fokus auf Ergebnis.</div></div>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-text"><h3>Angebot anfragen</h3><p>Für KMU bis Grossunternehmen · Zürich & schweizweit</p></div>
+      <button class="btn-primary">Jetzt anfragen</button>
+    </div>
+  </div>
+  <footer><p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p><div class="footer-links"><a href="#">FAQ</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div></footer>
+  <div class="watermark"><div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div><div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     WALK & TALK
+═══════════════════════════════════════════ -->
+<div id="walk" class="pv">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#">Angebote ▾</a>
+      <a href="#" class="on">Walk & Talk</a>
+      <a href="#">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+  <div class="walk-hero">
+    <div class="walk-hero-inner">
+      <div>
+        <div class="slabel">Walk & Talk Coaching Zürich</div>
+        <h1>Das Setting folgt der Fragestellung – nicht umgekehrt.</h1>
+        <p>Coaching und Beratung im Gehen fördert Kreativität, Klarheit und neue Perspektiven. Im Sihlwald, am Zürichsee oder auf einem Kilchberg-Weg.</p>
+        <button class="btn-primary">Walk & Talk ausprobieren</button>
+      </div>
+      <div class="walk-photo">🌲</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="slabel">3 Formate</div>
+    <div class="stitle">Wie wir zusammenarbeiten können</div>
+    <div class="settings-grid">
+      <div class="setting">
+        <div class="setting-icon">🪑</div>
+        <h4>Gespräch im Raum</h4>
+        <p>Struktur und Tiefe – klassisches Coaching im geschützten Rahmen in Zürich oder Kilchberg</p>
+      </div>
+      <div class="setting">
+        <div class="setting-icon">🌿</div>
+        <h4>Walk & Talk in der Natur</h4>
+        <p>Neue Perspektiven – Bewegung löst festgefahrene Denkmuster und bringt Klarheit</p>
+      </div>
+      <div class="setting">
+        <div class="setting-icon">💻</div>
+        <h4>Online möglich</h4>
+        <p>Flexibel – Coaching per Zoom oder Teams, schweizweit und international</p>
+      </div>
+    </div>
+    <div class="slabel">Warum Walk & Talk?</div>
+    <div class="stitle">Die Kraft der Bewegung im Coaching</div>
+    <div class="benefits-grid">
+      <div class="benefit"><div class="benefit-icon">🧠</div><h4>Mehr Kreativität</h4><p>Bewegung in der Natur löst festgefahrene Denkmuster und öffnet den Kopf für neue Ideen und Lösungen.</p></div>
+      <div class="benefit"><div class="benefit-icon">🌬️</div><h4>Entspannte Atmosphäre</h4><p>Kein Büro, kein Schreibtisch – Coaching auf Augenhöhe, natürlich und ohne Hierarchien.</p></div>
+      <div class="benefit"><div class="benefit-icon">👁️</div><h4>Neue Perspektiven</h4><p>Abstand vom Alltag schafft innere Klarheit und hilft, Entscheidungen leichter zu treffen.</p></div>
+      <div class="benefit"><div class="benefit-icon">💪</div><h4>Ganzheitliche Wirkung</h4><p>Die Verbindung von Bewegung und Reflexion wirkt auf Körper und Geist – nachhaltig und spürbar.</p></div>
+    </div>
+    <div class="slabel">Ablauf Walk & Talk</div>
+    <div class="stitle">Wie ein Outdoor-Coaching konkret abläuft</div>
+    <div class="process-col">
+      <div class="step-row"><div class="step-num">1</div><div class="step-content"><h5>Kennenlernen & Thema klären</h5><p>Kurzes Gespräch vorab – telefonisch oder per Zoom – um das Anliegen und den Weg zu klären.</p></div></div>
+      <div class="step-row"><div class="step-num">2</div><div class="step-content"><h5>Treffpunkt & Start</h5><p>Wir treffen uns am vereinbarten Ort – Sihlwald, Zürichsee, Kilchberg oder nach Absprache.</p></div></div>
+      <div class="step-row"><div class="step-num">3</div><div class="step-content"><h5>Coaching im Gehen</h5><p>60–90 Minuten – strukturiert, fokussiert und in Bewegung. Mit konkreten Impulsen und klaren Erkenntnissen.</p></div></div>
+      <div class="step-row"><div class="step-num">4</div><div class="step-content"><h5>Nächste Schritte</h5><p>Am Ende jeder Session definieren wir konkrete Massnahmen für deinen Alltag.</p></div></div>
+    </div>
+    <div class="cta-bar">
+      <div class="cta-bar-text"><h3>Walk & Talk ausprobieren</h3><p>Kostenloses Erstgespräch · Zürichsee, Sihlwald & Umgebung</p></div>
+      <button class="btn-primary">Jetzt anfragen</button>
+    </div>
+  </div>
+  <footer><p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p><div class="footer-links"><a href="#">FAQ</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div></footer>
+  <div class="watermark"><div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div><div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div></div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BLOG
+═══════════════════════════════════════════ -->
+<div id="blog" class="pv">
+  <nav>
+    <div class="logo">my<span>coaching</span>2go</div>
+    <div class="nav-links">
+      <a href="#">Über mich</a>
+      <a href="#">Angebote ▾</a>
+      <a href="#">Walk & Talk</a>
+      <a href="#" class="on">Blog</a>
+      <a href="#">Kontakt</a>
+    </div>
+    <button class="nav-cta">Erstgespräch vereinbaren</button>
+  </nav>
+  <div class="service-hero">
+    <div class="service-badge" style="background:#f0eeff;color:#3C3489;">Impulse & Inspiration</div>
+    <h1>Blog — Coaching, Leadership & Persönlichkeit</h1>
+    <p>Aktuelle Beiträge, praktische Tipps und Impulse rund um Business-Coaching, Work-Life-Balance, Leadership und persönliche Entwicklung – von Marcel Sonderer, Kilchberg bei Zürich.</p>
+  </div>
+  <div class="section">
+    <div class="blog-grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr));">
+      <div class="blog-card"><div class="blog-img g1">🧠</div><div class="blog-body"><div class="blog-tag">Work-Life-Balance</div><h4>Mentale Gesundheit: Balance & Performance steigern</h4><p>April 2025 · 5 Min.</p></div></div>
+      <div class="blog-card"><div class="blog-img g2">🌱</div><div class="blog-body"><div class="blog-tag">Persönlichkeit</div><h4>Vom Scheitern zum Erfolg — Entwicklung durch Lernen</h4><p>März 2025 · 4 Min.</p></div></div>
+      <div class="blog-card"><div class="blog-img g3">🎯</div><div class="blog-body"><div class="blog-tag">Karriere</div><h4>Deine wahre Leidenschaft entdecken</h4><p>Februar 2025 · 6 Min.</p></div></div>
+      <div class="blog-card"><div class="blog-img g1">🔀</div><div class="blog-body"><div class="blog-tag">Entscheidung</div><h4>Entscheidung & Veränderung: Tools und Methoden</h4><p>Januar 2025 · 5 Min.</p></div></div>
+      <div class="blog-card"><div class="blog-img g2">💬</div><div class="blog-body"><div class="blog-tag">Kommunikation</div><h4>Wirkungsvoll kommunizieren als Führungskraft</h4><p>Dezember 2024 · 4 Min.</p></div></div>
+      <div class="blog-card"><div class="blog-img g3">🧭</div><div class="blog-body"><div class="blog-tag">Persönliche Ziele</div><h4>Persönliche Ziele & Persönlichkeitsentwicklung</h4><p>November 2024 · 5 Min.</p></div></div>
+    </div>
+  </div>
+  <div class="footer-cta">
+    <h2>Bereit für den ersten Schritt?</h2>
+    <p>Unverbindliches Erstgespräch vereinbaren — kostenlos, telefonisch oder per Zoom.</p>
+    <button class="btn-white">Erstgespräch vereinbaren</button>
+  </div>
+  <footer><p>© 2026 mycoaching2go · Marcel Sonderer · Kilchberg bei Zürich</p><div class="footer-links"><a href="#">FAQ</a><a href="#">Impressum</a><a href="#">Datenschutz</a></div></footer>
+  <div class="watermark"><div class="watermark-left">Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div><div class="watermark-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div></div>
+</div>
+
+</div><!-- end .site -->
+
+<script>
+function sp(id, el) {
+  document.querySelectorAll('.pv').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  if (el) el.classList.add('on');
+  else {
+    const map = {home:0,priv:1,exec:2,team:3,walk:4,blog:5};
+    document.querySelectorAll('.switcher button')[map[id]].classList.add('on');
+  }
+  window.scrollTo(0, 0);
+}
+function tog(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.acc-arrow');
+  const isOpen = body.classList.contains('open');
+  header.closest('.accordion').querySelectorAll('.acc-body').forEach(b => b.classList.remove('open'));
+  header.closest('.accordion').querySelectorAll('.acc-arrow').forEach(a => a.style.transform = '');
+  if (!isOpen) {
+    body.classList.add('open');
+    arrow.style.transform = 'rotate(180deg)';
+  }
+}
+</script>
+</body>
+</html>
