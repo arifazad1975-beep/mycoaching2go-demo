@@ -200,10 +200,12 @@ footer p { font-size: 13px; color: #aaa; }
 .setting p { font-size: 12px; color: #888; line-height: 1.5; }
 
 /* ── WATERMARK ── */
-.watermark { background: #1a1a1a; padding: 10px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 2px solid #1A5C35; }
-.watermark-left { font-size: 12px; color: #aaa; }
-.watermark-left strong { color: #1A5C35; font-weight: 700; }
-.watermark-right { font-size: 11px; color: #555; font-style: italic; }
+.watermark { display: none; }
+.wm-fixed { position: fixed; bottom: 0; left: 0; right: 0; z-index: 99999; background: #1a1a1a; border-top: 2px solid #1A5C35; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.wm-fixed-left { font-size: 12px; color: #ccc; }
+.wm-fixed-left strong { color: #1A5C35; font-weight: 700; }
+.wm-fixed-right { font-size: 11px; color: #555; font-style: italic; }
+body { padding-bottom: 44px; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 700px) {
@@ -797,6 +799,12 @@ footer p { font-size: 13px; color: #aaa; }
 </div>
 
 </div><!-- end .site -->
+
+<!-- FIXED WATERMARK -->
+<div class="wm-fixed">
+  <div class="wm-fixed-left">🔒 Konzept & Design: <strong>Abul Azad</strong> · Web Developer · abul.azad@malt.ch</div>
+  <div class="wm-fixed-right">Entwurf — Nur zur Präsentation · Nicht zur Weitergabe · © 2026</div>
+</div>
 
 <script>
 function sp(id, el) {
